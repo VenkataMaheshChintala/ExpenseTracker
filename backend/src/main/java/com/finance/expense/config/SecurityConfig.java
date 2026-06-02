@@ -31,16 +31,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(org.springframework.security.config.Customizer.withDefaults())
-            .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+        // http.cors(org.springframework.security.config.Customizer.withDefaults())
+        //     .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable)
+        //     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        //     .authorizeHttpRequests(auth -> auth
+        //         .requestMatchers("/api/auth/**").permitAll()
+        //         .anyRequest().authenticated()
+        //     );
+
+        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // return http.build();
+
+        http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
-            );
+        );
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+    return http.build();
     }
 }
