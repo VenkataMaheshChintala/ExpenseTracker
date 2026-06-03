@@ -20,8 +20,18 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="active" onclick="switchTab('dashboard', this)">Dashboard</li>
-                    <li onclick="switchTab('expenses', this)">Expenses</li>
+                    <li id="nav-dashboard" class="active" onclick="switchTab('dashboard', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                    </li>
+                    <li id="nav-expenses" onclick="switchTab('expenses', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                        Expenses
+                    </li>
+                    <li id="nav-categories" onclick="switchTab('categories', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        Categories
+                    </li>
                 </ul>
             </nav>
             <div style="margin-top: auto;">
@@ -35,7 +45,10 @@
         <main class="main-content">
             <header class="topbar">
                 <h1 id="pageTitle">Financial Overview</h1>
-                <button class="btn btn-primary" onclick="openAddExpenseModal()">Add Expense</button>
+                <div style="display:flex; gap: 0.75rem;">
+                    <button id="btnNewCategory" class="btn btn-outline hidden" onclick="openCreateCategoryModal()">+ New Category</button>
+                    <button id="btnAddExpense" class="btn btn-primary" onclick="openAddExpenseModal()">Add Expense</button>
+                </div>
             </header>
 
             <!-- Dashboard Tab -->
@@ -138,6 +151,46 @@
                 </div>
             </div>
 
+            <!-- Categories Tab -->
+            <div id="tab-categories" class="hidden">
+                <!-- Category List View -->
+                <div id="categoryListView">
+                    <div id="categoryCardsGrid" class="category-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Category Detail View (shown when a category is clicked) -->
+                <div id="categoryDetailView" class="hidden">
+                    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
+                        <button class="btn btn-outline" onclick="closeCategoryDetail()" style="padding:0.5rem 1rem; font-size:0.9rem;">
+                            ← Back
+                        </button>
+                        <div>
+                            <h2 id="categoryDetailName" style="margin:0; font-size:1.5rem;"></h2>
+                            <p id="categoryDetailMeta" style="color:var(--text-muted); font-size:0.9rem; margin:0;"></p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openAddExpenseInCategory()" style="margin-left:auto;">+ Add Expense</button>
+                    </div>
+
+                    <div class="glass table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th style="text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryExpensesTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -168,6 +221,43 @@
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                     <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeAddExpenseModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Category Modal -->
+    <div id="createCategoryModal" class="modal-overlay hidden">
+        <div class="modal-content glass">
+            <h2 style="margin-bottom: 0.5rem;">New Category</h2>
+            <p style="color:var(--text-muted); margin-bottom:1.5rem; font-size:0.9rem;">Give your category a descriptive name, e.g. "Goa Trip 2024" or "Monthly Groceries".</p>
+            <form id="createCategoryForm">
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" id="newCatName" class="input-field" placeholder="e.g. Goa Trip 2024" required>
+                </div>
+                <div id="createCatError" style="color:var(--danger); font-size:0.85rem; margin-top:-0.5rem; margin-bottom:1rem; display:none;"></div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeCreateCategoryModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rename Category Modal -->
+    <div id="renameCategoryModal" class="modal-overlay hidden">
+        <div class="modal-content glass">
+            <h2 style="margin-bottom: 1.5rem;">Rename Category</h2>
+            <form id="renameCategoryForm">
+                <div class="form-group">
+                    <label>New Name</label>
+                    <input type="text" id="renameCatName" class="input-field" required>
+                </div>
+                <div id="renameCatError" style="color:var(--danger); font-size:0.85rem; margin-top:-0.5rem; margin-bottom:1rem; display:none;"></div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeRenameCategoryModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Rename</button>
                 </div>
             </form>
         </div>
