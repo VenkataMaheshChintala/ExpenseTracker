@@ -16,6 +16,7 @@ public class Category {
 
     private String name;
     
+    @Column(name = "is_default")
     private boolean isDefault;
     
     @ManyToOne(fetch = FetchType.LAZY)

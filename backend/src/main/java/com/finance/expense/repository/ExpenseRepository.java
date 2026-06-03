@@ -8,4 +8,5 @@ import java.util.List;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByUserIdOrderByDateDesc(Long userId);
     List<Expense> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
+    List<Expense> findByUserIdAndCategoryIdOrderByDateDesc(Long userId, Long categoryId);
 }

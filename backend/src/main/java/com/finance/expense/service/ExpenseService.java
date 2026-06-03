@@ -86,7 +86,7 @@ public class ExpenseService {
         return mapToDto(expense);
     }
 
-    private ExpenseDto mapToDto(Expense expense) {
+    ExpenseDto mapToDto(Expense expense) {
         ExpenseDto dto = new ExpenseDto();
         dto.setId(expense.getId());
         dto.setAmount(expense.getAmount());
